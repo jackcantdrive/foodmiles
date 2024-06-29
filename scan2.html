@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Paper Detection</title>
+    <script async src="https://docs.opencv.org/4.5.5/opencv.js"></script>
+</head>
+<body>
+    <h1>Paper Detection</h1>
+    <input type="file" id="fileInput" accept="image/*">
+    <canvas id="canvasOutput"></canvas>
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function (e) {
+    let file = e.target.files[0];
+    let reader = new FileReader();
+    reader.onload = function (event) {
+        let img = new Image();
+        img.onload = function () {
+            let canvas = document.createElement('canvas');
+            let context = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            context.drawImage(img, 0, 0);
+            let src = cv.imread(canvas);
+            let dst = new cv.Mat();
+
+            // Convert to grayscale
+            cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY, 0);
+            // Gaussian blur
+            cv.GaussianBlur(src, src, new cv.Size(5, 5), 0, 0, cv.BORDER_DEFAULT);
+            // Canny edge detection
+            cv.Canny(src, dst, 75, 200);
+
+            // Find contours
+            let contours = new cv.MatVector();
+            let hierarchy = new cv.Mat();
+            cv.findContours(dst, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+
+            // Find the largest contour, assuming it's the paper
+            let largestContour = contours.get(0);
+            for (let i = 1; i < contours.size(); ++i) {
+                if (cv.contourArea(contours.get(i)) > cv.contourArea(largestContour)) {
+                    largestContour = contours.get(i);
+                }
+            }
+
+            // Approximate the contour to a polygon
+            let approx = new cv.Mat();
+            cv.approxPolyDP(largestContour, approx, 0.02 * cv.arcLength(largestContour, true), true);
+
+            // Draw the polygon on the original image
+            let vertices = [];
+            for (let i = 0; i < approx.rows; ++i) {
+                vertices.push({x: approx.data32S[i*2], y: approx.data32S[i*2 + 1]});
+            }
+            src = cv.imread(canvas);
+            for (let i = 0; i < vertices.length; i++) {
+                let pt1 = new cv.Point(vertices[i].x, vertices[i].y);
+                let pt2 = new cv.Point(vertices[(i + 1) % vertices.length].x, vertices[(i + 1) % vertices.length].y);
+                cv.line(src, pt1, pt2, [255, 0, 0, 255], 4);
+            }
+
+            cv.imshow('canvasOutput', src);
+
+            // Clean up
+            src.delete();
+            dst.delete();
+            contours.delete();
+            hierarchy.delete();
+            largestContour.delete();
+            approx.delete();
+        };
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+});
+
+    </script>
+</body>
+</html>
