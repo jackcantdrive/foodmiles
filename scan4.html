@@ -26,20 +26,24 @@
             canvas.width = img.width;
             canvas.height = img.height;
             context.drawImage(img, 0, 0);
+
+
             let src = cv.imread(canvas);
             let dst = new cv.Mat();
             const st = performance.now();
             // Convert to grayscale
             cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY, 0);
             // Gaussian blur
-            cv.GaussianBlur(src, src, new cv.Size(5, 5), 0, 0, cv.BORDER_DEFAULT);
+            cv.GaussianBlur(src, src, new cv.Size(15, 15), 0, 0, cv.BORDER_DEFAULT);
             // Canny edge detection
-            cv.Canny(src, dst, 75, 200);
+            // cv.Canny(src, dst, 75, 200);
+            cv.Canny(src, dst, 10, 14);
 
             // Find contours
             let contours = new cv.MatVector();
             let hierarchy = new cv.Mat();
             cv.findContours(dst, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+            // cv.findContours(dst, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_NONE);
 
             // Find the largest contour, assuming it's the paper
             let largestContour = contours.get(0);
@@ -63,7 +67,38 @@
                 let pt1 = new cv.Point(vertices[i].x, vertices[i].y);
                 let pt2 = new cv.Point(vertices[(i + 1) % vertices.length].x, vertices[(i + 1) % vertices.length].y);
                 cv.line(src, pt1, pt2, [255, 0, 0, 255], 4);
+                // cv.line(src, pt1, pt2, [0, 255, 255, 255], 4);
             }
+
+            const contoursByArea = [];
+            for (let i = 0; i < contours.size(); ++i) {
+                contoursByArea.push({contour: contours.get(i), area: cv.contourArea(contours.get(i))});
+            }
+            contoursByArea.sort((a, b) => b.area - a.area);
+
+
+            // debugger;
+            for (let i = 1; i < contoursByArea.length && i < 4; i++) {
+                const contour = contoursByArea[i].contour;
+                console.log(cv.contourArea(contour));
+                // Approximate the contour to a polygon
+                let approx = new cv.Mat();
+                cv.approxPolyDP(contour, approx, 0.02 * cv.arcLength(contour, true), true);
+
+                // Draw the polygon on the original image
+                let vertices = [];
+                for (let i = 0; i < approx.rows; ++i) {
+                    vertices.push({x: approx.data32S[i*2], y: approx.data32S[i*2 + 1]});
+                }
+                // src = cv.imread(canvas);
+                for (let i = 0; i < vertices.length; i++) {
+                    let pt1 = new cv.Point(vertices[i].x, vertices[i].y);
+                    let pt2 = new cv.Point(vertices[(i + 1) % vertices.length].x, vertices[(i + 1) % vertices.length].y);
+                    cv.line(src, pt1, pt2, [0, 0, 255, 255], 4);
+                }
+                contour.delete();
+            }
+
 
             cv.imshow('canvasOutput', src);
 
@@ -98,6 +133,14 @@
             webcamCanvas.height = webcam.videoHeight;
             const webcamCtx = webcamCanvas.getContext('2d');
             webcamCtx.drawImage(webcam, 0, 0, webcamCanvas.width, webcamCanvas.height);
+
+            // const targetWidth = 1000;
+            // const scale = targetWidth / webcam.videoWidth;
+            // webcamCanvas.width = targetWidth;
+            // webcamCanvas.height = webcam.videoHeight * scale;
+            // const webcamCtx = webcamCanvas.getContext('2d');
+            // webcamCtx.drawImage(webcam, 0, 0, webcamCanvas.width, webcamCanvas.height);
+
 
             img = webcamCanvas;
             scan();
