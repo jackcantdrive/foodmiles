@@ -11,7 +11,7 @@
 
     <img id='image' src="IMG_8409-2-copy.jpg"/>
     <!-- <video id="webcam" width="640" height="480" autoplay></video> -->
-    <video id="webcam" src='IMG_8416.mp4' autoplay></video>
+    <video id="webcam" src='IMG_8416.mp4' controls autoplay></video>
 
     <canvas id="canvasOutput"></canvas>
 
@@ -20,6 +20,8 @@
         img.onload = function () {
             scan();
         }
+
+        let prevFrameVertices = undefined;
 
         const scan = () => {
             let canvas = document.createElement('canvas');
@@ -92,7 +94,7 @@
             // debugger;
             for (let i = 0; i < contoursByArea.length && i < 4; i++) {
                 const contour = contoursByArea[i].contour;
-                console.log(cv.contourArea(contour));
+                // console.log(cv.contourArea(contour));
                 // Approximate the contour to a polygon
                 let approx = new cv.Mat();
                 cv.approxPolyDP(contour, approx, 0.02 * cv.arcLength(contour, true), true);
@@ -103,12 +105,17 @@
                     vertices.push({x: approx.data32S[i*2], y: approx.data32S[i*2 + 1]});
                 }
 
-                let color;
-                if (i === 0) {
-                    color = [255, 0, 0, 255];
-                } else {
-                    color = [0, 0, 255, 255];
-                }
+                // let color;
+                // if (i === 0) {
+                //     color = [255, 0, 0, 255];
+                // } else {
+                //     // color = [0, 0, 255, 255];
+                //     color = [0, contoursByArea[i].area * 40, 255, 255];
+                // }
+                let color = [0, contoursByArea[i].area * 40, 255, 255];
+
+                if (vertices.length !== 4 || contoursByArea[i].area < 3) continue;
+
 
                 // src = cv.imread(canvas);
                 for (let i = 0; i < vertices.length; i++) {
@@ -117,6 +124,38 @@
                     // cv.line(src, pt1, pt2, [0, 0, 255, 255], 4);
                     cv.line(src, pt1, pt2, color, 4);
                 }
+
+                if (i === 0) {
+                    // console.log(vertices)
+
+                    if (prevFrameVertices) {
+                        const prevFrameVerticesSorted = prevFrameVertices.sort((a, b) => a.x - b.x);
+                        const verticesSorted = vertices.sort((a, b) => a.x - b.x);
+
+                        const topLeft = verticesSorted[0];
+                        const topRight = verticesSorted[1];
+                        const bottomRight = verticesSorted[2];
+                        const bottomLeft = verticesSorted[3];
+
+                        const topLeftPrev = prevFrameVerticesSorted[0];
+                        const topRightPrev = prevFrameVerticesSorted[1];
+                        const bottomRightPrev = prevFrameVerticesSorted[2];
+                        const bottomLeftPrev = prevFrameVerticesSorted[3];
+
+                        const topLeftDiff = Math.abs(topLeft.x - topLeftPrev.x) + Math.abs(topLeft.y - topLeftPrev.y);
+                        const topRightDiff = Math.abs(topRight.x - topRightPrev.x) + Math.abs(topRight.y - topRightPrev.y);
+                        const bottomRightDiff = Math.abs(bottomRight.x - bottomRightPrev.x) + Math.abs(bottomRight.y - bottomRightPrev.y);
+                        const bottomLeftDiff = Math.abs(bottomLeft.x - bottomLeftPrev.x) + Math.abs(bottomLeft.y - bottomLeftPrev.y);
+
+                        const diffThreshold = 10;
+                        if (topLeftDiff < diffThreshold && topRightDiff < diffThreshold && bottomRightDiff < diffThreshold && bottomLeftDiff < diffThreshold) {
+                            console.log('Paper detected');
+                        }
+                    }
+
+                    prevFrameVertices = vertices;
+                }
+
                 contour.delete();
                 approx.delete();
             }
@@ -130,7 +169,7 @@
             hierarchy.delete();
             // largestContour.delete();
             // approx.delete();
-            console.log(performance.now() - st);
+            // console.log(performance.now() - st);
         };
         // img.src = event.target.result;
 
