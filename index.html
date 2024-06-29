@@ -28,22 +28,13 @@
 <script src="./opencv-4.7.0.js"></script>
 <script src="./jscanify.min.js"></script>
 </head>
-<body onload="run()">
+<body>
 <!-- <img id='image' src="IMG_8409-2.jpg" style="width:100px;"/> -->
 <div id="imageContainer">
     <!-- <img id='image' src="IMG_8409-2.jpg"/> -->
     <!-- <img id='image' src="IMG_8411.jpg"/> -->
     <img id='image' src="document-on-desk.jpg"/>
 </div>
-<script>
-setTimeout(() => {
-    var scanner = new jscanify();
-    var paperWidth = 1000/(2**0.5)
-    var paperHeight = 1000;
-    var resultCanvas = scanner.extractPaper(image, paperWidth, paperHeight);
-    document.body.appendChild(resultCanvas);
-}, 1000);
-</script>
-
+<script src="main.js"></script>
 </body>
 </html>
