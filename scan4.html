@@ -8,13 +8,12 @@
 <body>
     <h1>Paper Detection</h1>
     <input type="file" id="fileInput" accept="image/*">
+
+    <img id='image' src="IMG_8409-2-copy.jpg"/>
+
     <canvas id="canvasOutput"></canvas>
 
     <script>
-        document.getElementById('fileInput').addEventListener('change', function (e) {
-    let file = e.target.files[0];
-    let reader = new FileReader();
-    reader.onload = function (event) {
         let img = new Image();
         img.onload = function () {
             let canvas = document.createElement('canvas');
@@ -24,7 +23,7 @@
             context.drawImage(img, 0, 0);
             let src = cv.imread(canvas);
             let dst = new cv.Mat();
-
+            const st = performance.now();
             // Convert to grayscale
             cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY, 0);
             // Gaussian blur
@@ -70,12 +69,23 @@
             hierarchy.delete();
             largestContour.delete();
             approx.delete();
+            console.log(performance.now() - st);
         };
-        img.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
-});
+        // img.src = event.target.result;
 
+
+        function waitForOpenCV(callback) {
+            if (typeof cv !== 'undefined' && typeof cv.Mat === 'function') {
+                callback();
+            } else {
+                setTimeout(function() {
+                    waitForOpenCV(callback);
+                }, 100);
+            }
+        }
+        waitForOpenCV(() => {
+            img.src = image.src;
+        });
     </script>
 </body>
 </html>
