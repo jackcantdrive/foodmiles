@@ -13,10 +13,11 @@
 <body>
     <h1>Paper Detection</h1>
     <input type="file" id="fileInput" accept="image/*">
-
+    <img id="modifiedMenu" src="IMG_8418-perspective-crop.png"/>
     <img id='image' src="IMG_8409-2-copy.jpg"/>
     <!-- <video id="webcam" width="640" height="480" autoplay></video> -->
-    <video id="webcam" src='IMG_8416.mp4' controls autoplay muted></video>
+    <!-- <video id="webcam" src='IMG_8416.mp4' controls autoplay muted></video> -->
+    <video id="webcam" src='IMG_8417.mp4' controls autoplay muted></video>
 
     <canvas id="canvasOutput"></canvas>
     <canvas id="arCanvas"></canvas>
@@ -243,6 +244,96 @@
                     }
                     arContext.closePath();
                     arContext.fill();
+
+                    // arContext.clearRect(0, 0, arCanvas.width, arCanvas.height);
+                    // arContext.fillStyle = '#0f0';
+
+                    // const startX = 100, startY = 100;
+                    // const endX = 500, endY = 100;
+                    // const bottomX = 500, bottomY = 300;
+                    // const topX = 100, topY = 300;
+
+                    // Draw the image with perspective transformation
+                    arContext.save();
+                    // arContext.beginPath();
+                    // arContext.moveTo(startX, startY);
+                    // arContext.lineTo(endX, endY);
+                    // arContext.lineTo(bottomX, bottomY);
+                    // arContext.lineTo(topX, topY);
+                    // arContext.closePath();
+                    // arContext.clip();
+
+                    // // Transform to apply perspective
+                    // arContext.transform(
+                    //     endX - startX, endY - startY,
+                    //     bottomX - startX, bottomY - startY,
+                    //     startX, startY
+                    // );
+
+                    // // Draw the image
+                    // // arContext.drawImage(modifiedMenu, 0, 0, modifiedMenu.width, modifiedMenu.height, startX, startY, endX - startX, bottomY - startY);
+                    // arContext.fillRect(startX, startY, endX - startX, bottomY - startY);
+                    // // debugger
+
+
+                    const srcPoints = [
+                        { x: 0, y: 0 },
+                        { x: modifiedMenu.width, y: 0 },
+                        { x: modifiedMenu.width, y: modifiedMenu.height },
+                        { x: 0, y: modifiedMenu.height }
+                    ];
+
+                    // const dstPoints = [
+                    //     { x: 50, y: 50 },
+                    //     { x: 250, y: 50 },
+                    //     { x: 200, y: 200 },
+                    //     { x: 0, y: 200 }
+                    // ];
+                    const dstPoints = prevFrameVertices.map(p => ({x: p.x * arCanvas.width, y: p.y * arCanvas.height}));
+
+                    // debugger
+
+                    // Apply perspective transformation
+                    // arContext.setTransform(
+                    //     (dstPoints[1].x - dstPoints[0].x) / (srcPoints[1].x - srcPoints[0].x),
+                    //     (dstPoints[2].x - dstPoints[1].x) / (srcPoints[2].x - srcPoints[1].x),
+                    //     (dstPoints[0].y - dstPoints[1].y + dstPoints[2].y - dstPoints[3].y) /
+                    //     (srcPoints[0].y - srcPoints[1].y + srcPoints[2].y - srcPoints[3].y),
+                    //     (dstPoints[0].y - dstPoints[3].y) / (srcPoints[0].y - srcPoints[3].y),
+                    //     dstPoints[0].x - srcPoints[0].x * ((dstPoints[1].x - dstPoints[0].x) / (srcPoints[1].x - srcPoints[0].x)),
+                    //     dstPoints[0].y - srcPoints[0].y * ((dstPoints[0].y - dstPoints[3].y) / (srcPoints[0].y - srcPoints[3].y))
+                    // );
+
+
+                    arContext.fillStyle = '#ff0';
+                    // arContext.beginPath();
+                    // arContext.moveTo(paperVertices[0].x * arCanvas.width, paperVertices[0].y * arCanvas.width);
+                    // for (let i = 1; i < paperVertices.length; i++) {
+                    //     arContext.lineTo(paperVertices[i].x * arCanvas.width, paperVertices[i].y * arCanvas.width);
+                    // }
+                    // arContext.closePath();
+                    // arContext.fill();
+
+                    // arContext.setTransform(1, 0.2, 0.8, 1, 0, 0);
+                    arContext.setTransform(
+                        (dstPoints[1].x - dstPoints[0].x) / (srcPoints[1].x - srcPoints[0].x),
+                        (dstPoints[2].x - dstPoints[1].x) / (srcPoints[2].x - srcPoints[1].x),
+                        (dstPoints[0].y - dstPoints[1].y + dstPoints[2].y - dstPoints[3].y) /
+                        (srcPoints[0].y - srcPoints[1].y + srcPoints[2].y - srcPoints[3].y),
+                        (dstPoints[0].y - dstPoints[3].y) / (srcPoints[0].y - srcPoints[3].y),
+                        dstPoints[0].x - srcPoints[0].x * ((dstPoints[1].x - dstPoints[0].x) / (srcPoints[1].x - srcPoints[0].x)),
+                        dstPoints[0].y - srcPoints[0].y * ((dstPoints[0].y - dstPoints[3].y) / (srcPoints[0].y - srcPoints[3].y))
+                    );
+                    arContext.fillRect(0, 0, 100, 100);
+
+
+                    // Draw the transformed image
+                    // arContext.drawImage(modifiedMenu, 0, 0);
+
+                    
+                    arContext.restore();
+                    // debugger
+
                 }
             } else {
                 paperVertices = undefined;
