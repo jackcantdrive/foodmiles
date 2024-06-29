@@ -28,7 +28,7 @@
             // canvas.height = img.height;
             // context.drawImage(img, 0, 0);
 
-            const max_width = 300;
+            const max_width = 100;
             const width = Math.min(max_width, img.width);
             const scale = img.width / width;
             canvas.width = width;
@@ -53,30 +53,31 @@
             cv.findContours(dst, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
             // cv.findContours(dst, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_NONE);
 
-            // Find the largest contour, assuming it's the paper
-            let largestContour = contours.get(0);
-            for (let i = 1; i < contours.size(); ++i) {
-                if (cv.contourArea(contours.get(i)) > cv.contourArea(largestContour)) {
-                    largestContour = contours.get(i);
-                }
-            }
+            // // Find the largest contour, assuming it's the paper
+            // let largestContour = contours.get(0);
+            // for (let i = 1; i < contours.size(); ++i) {
+            //     if (cv.contourArea(contours.get(i)) > cv.contourArea(largestContour)) {
+            //         largestContour = contours.get(i);
+            //     }
+            // }
 
-            // Approximate the contour to a polygon
-            let approx = new cv.Mat();
-            cv.approxPolyDP(largestContour, approx, 0.02 * cv.arcLength(largestContour, true), true);
+            // // Approximate the contour to a polygon
+            // let approx = new cv.Mat();
+            // cv.approxPolyDP(largestContour, approx, 0.02 * cv.arcLength(largestContour, true), true);
 
-            // Draw the polygon on the original image
-            let vertices = [];
-            for (let i = 0; i < approx.rows; ++i) {
-                vertices.push({x: approx.data32S[i*2], y: approx.data32S[i*2 + 1]});
-            }
-            src = cv.imread(canvas);
-            for (let i = 0; i < vertices.length; i++) {
-                let pt1 = new cv.Point(vertices[i].x, vertices[i].y);
-                let pt2 = new cv.Point(vertices[(i + 1) % vertices.length].x, vertices[(i + 1) % vertices.length].y);
-                cv.line(src, pt1, pt2, [255, 0, 0, 255], 4);
-                // cv.line(src, pt1, pt2, [0, 255, 255, 255], 4);
-            }
+            // // Draw the polygon on the original image
+            // let vertices = [];
+            // for (let i = 0; i < approx.rows; ++i) {
+            //     vertices.push({x: approx.data32S[i*2], y: approx.data32S[i*2 + 1]});
+            // }
+            // src = cv.imread(canvas);
+            // for (let i = 0; i < vertices.length; i++) {
+            //     let pt1 = new cv.Point(vertices[i].x, vertices[i].y);
+            //     let pt2 = new cv.Point(vertices[(i + 1) % vertices.length].x, vertices[(i + 1) % vertices.length].y);
+            //     cv.line(src, pt1, pt2, [255, 0, 0, 255], 4);
+            //     // cv.line(src, pt1, pt2, [0, 255, 255, 255], 4);
+            //     debugger
+            // }
 
             const contoursByArea = [];
             for (let i = 0; i < contours.size(); ++i) {
@@ -84,9 +85,12 @@
             }
             contoursByArea.sort((a, b) => b.area - a.area);
 
+            // Find the largest contour, assuming it's the paper
+            const largestContour = contoursByArea[0].contour;
+            src = cv.imread(canvas);
 
             // debugger;
-            for (let i = 1; i < contoursByArea.length && i < 4; i++) {
+            for (let i = 0; i < contoursByArea.length && i < 4; i++) {
                 const contour = contoursByArea[i].contour;
                 console.log(cv.contourArea(contour));
                 // Approximate the contour to a polygon
@@ -98,15 +102,24 @@
                 for (let i = 0; i < approx.rows; ++i) {
                     vertices.push({x: approx.data32S[i*2], y: approx.data32S[i*2 + 1]});
                 }
+
+                let color;
+                if (i === 0) {
+                    color = [255, 0, 0, 255];
+                } else {
+                    color = [0, 0, 255, 255];
+                }
+
                 // src = cv.imread(canvas);
                 for (let i = 0; i < vertices.length; i++) {
                     let pt1 = new cv.Point(vertices[i].x, vertices[i].y);
                     let pt2 = new cv.Point(vertices[(i + 1) % vertices.length].x, vertices[(i + 1) % vertices.length].y);
-                    cv.line(src, pt1, pt2, [0, 0, 255, 255], 4);
+                    // cv.line(src, pt1, pt2, [0, 0, 255, 255], 4);
+                    cv.line(src, pt1, pt2, color, 4);
                 }
                 contour.delete();
+                approx.delete();
             }
-
 
             cv.imshow('canvasOutput', src);
 
@@ -115,8 +128,8 @@
             dst.delete();
             contours.delete();
             hierarchy.delete();
-            largestContour.delete();
-            approx.delete();
+            // largestContour.delete();
+            // approx.delete();
             console.log(performance.now() - st);
         };
         // img.src = event.target.result;
