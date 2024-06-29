@@ -12,13 +12,17 @@
     }
 
     #image {
-        transform: scale(0.1);
-        transform-origin: top left;
+        /* transform: scale(0.1);
+        transform-origin: top left; */
     }
 
     #imageContainer {
         width: 300px;
         height: 400px;
+    }
+
+    #webcam {
+        padding-bottom: 10vh;
     }
 </style>
 
@@ -30,11 +34,13 @@
 </head>
 <body>
 <!-- <img id='image' src="IMG_8409-2.jpg" style="width:100px;"/> -->
+<video id="webcam" width="640" height="480" autoplay></video>
 <div id="imageContainer">
     <!-- <img id='image' src="IMG_8409-2.jpg"/> -->
     <!-- <img id='image' src="IMG_8411.jpg"/> -->
     <img id='image' src="document-on-desk.jpg"/>
 </div>
+<div id="scanContainer"></div>
 <script src="main.js"></script>
 </body>
 </html>
