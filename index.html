@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- <title>X</title> -->
+<style>
+
+    * {
+        padding: 0;
+        margin: 0;
+    }
+
+    #image {
+        transform: scale(0.1);
+        transform-origin: top left;
+    }
+
+    #imageContainer {
+        width: 300px;
+        height: 400px;
+    }
+</style>
+
+<!-- <script src="https://docs.opencv.org/4.7.0/opencv.js" async></script>
+<script src="https://cdn.jsdelivr.net/gh/ColonelParrot/jscanify@master/src/jscanify.min.js"></script> -->
+
+<script src="./opencv-4.7.0.js"></script>
+<script src="./jscanify.min.js"></script>
+</head>
+<body onload="run()">
+<!-- <img id='image' src="IMG_8409-2.jpg" style="width:100px;"/> -->
+<div id="imageContainer">
+    <!-- <img id='image' src="IMG_8409-2.jpg"/> -->
+    <!-- <img id='image' src="IMG_8411.jpg"/> -->
+    <img id='image' src="document-on-desk.jpg"/>
+</div>
+<script>
+setTimeout(() => {
+    var scanner = new jscanify();
+    var paperWidth = 1000/(2**0.5)
+    var paperHeight = 1000;
+    var resultCanvas = scanner.extractPaper(image, paperWidth, paperHeight);
+    document.body.appendChild(resultCanvas);
+}, 1000);
+</script>
+
+</body>
+</html>
