@@ -10,12 +10,17 @@
     <input type="file" id="fileInput" accept="image/*">
 
     <img id='image' src="IMG_8409-2-copy.jpg"/>
+    <video id="webcam" width="640" height="480" autoplay></video>
 
     <canvas id="canvasOutput"></canvas>
 
     <script>
         let img = new Image();
         img.onload = function () {
+            scan();
+        }
+
+        const scan = () => {
             let canvas = document.createElement('canvas');
             let context = canvas.getContext('2d');
             canvas.width = img.width;
@@ -83,8 +88,51 @@
                 }, 100);
             }
         }
+
+        const webcamScan = () => {
+            requestAnimationFrame(webcamScan)
+            // render webcam image to canvas
+            const webcam = document.getElementById('webcam');
+            const webcamCanvas = document.createElement('canvas');
+            webcamCanvas.width = webcam.videoWidth;
+            webcamCanvas.height = webcam.videoHeight;
+            const webcamCtx = webcamCanvas.getContext('2d');
+            webcamCtx.drawImage(webcam, 0, 0, webcamCanvas.width, webcamCanvas.height);
+
+            img = webcamCanvas;
+            scan();
+        }
+
         waitForOpenCV(() => {
-            img.src = image.src;
+
+            // img.src = image.src;
+
+            // Get the video element
+            const video = document.getElementById('webcam');
+
+            // const button = document.createElement('button');
+            // button.onclick = () => {
+            // Check if the browser supports getUserMedia
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                // Request access to the webcam
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                        // Assign the stream to the video element's srcObject
+                        video.srcObject = stream;
+                    })
+                    .catch(function(error) {
+                        console.error("Error accessing the webcam: ", error);
+                    });
+            } else {
+                console.error("getUserMedia not supported by this browser.");
+            }
+
+            webcamScan();
+            // }
+            // button.textContent = 'webcam';
+            // document.body.append(button);
+
+            
         });
     </script>
 </body>
