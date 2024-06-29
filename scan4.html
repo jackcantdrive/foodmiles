@@ -6,7 +6,7 @@
     <!-- <script async src="https://docs.opencv.org/4.5.5/opencv.js"></script> -->
     <style>
         #arCanvas {
-            height: 30vh;
+            height: 50vh;
         }
     </style>
 </head>
@@ -28,9 +28,14 @@
         }
 
         let prevFrameVertices = undefined;
-        let paperDecay = 0;
+        // let paperDecay = 0;
+        let paperDecay2 = [];
 
         const scan = () => {
+            paperDecay2.unshift(0);
+            if (paperDecay2.length > 30) {
+                paperDecay2.pop();
+            }
             let canvas = document.createElement('canvas');
             let context = canvas.getContext('2d');
             // canvas.width = img.width;
@@ -134,15 +139,20 @@
 
                 if (i === 0) {
                     // console.log(vertices)
+                    const verticesScaled = vertices.map(v => ({x: v.x / width, y: v.y / width}));
 
                     if (prevFrameVertices) {
-                        const prevFrameVerticesSorted = prevFrameVertices.sort((a, b) => a.x - b.x);
-                        const verticesSorted = vertices.sort((a, b) => a.x - b.x);
+                        // const prevFrameVerticesSorted = prevFrameVertices.sort((a, b) => a.x - b.x);
+                        // const verticesSorted = vertices.sort((a, b) => a.x - b.x);
 
-                        const topLeft = verticesSorted[0];
-                        const topRight = verticesSorted[1];
-                        const bottomRight = verticesSorted[2];
-                        const bottomLeft = verticesSorted[3];
+                        const prevFrameVerticesSorted = prevFrameVertices;
+                        // const verticesSorted = vertices;
+
+                        // debugger
+                        const topLeft = verticesScaled[0];
+                        const topRight = verticesScaled[1];
+                        const bottomRight = verticesScaled[2];
+                        const bottomLeft = verticesScaled[3];
 
                         const topLeftPrev = prevFrameVerticesSorted[0];
                         const topRightPrev = prevFrameVerticesSorted[1];
@@ -153,15 +163,18 @@
                         const topRightDiff = Math.abs(topRight.x - topRightPrev.x) + Math.abs(topRight.y - topRightPrev.y);
                         const bottomRightDiff = Math.abs(bottomRight.x - bottomRightPrev.x) + Math.abs(bottomRight.y - bottomRightPrev.y);
                         const bottomLeftDiff = Math.abs(bottomLeft.x - bottomLeftPrev.x) + Math.abs(bottomLeft.y - bottomLeftPrev.y);
+                        // debugger
 
-                        const diffThreshold = max_width/10;
+                        const diffThreshold = 0.1;
                         if (topLeftDiff < diffThreshold && topRightDiff < diffThreshold && bottomRightDiff < diffThreshold && bottomLeftDiff < diffThreshold) {
                             // console.log('Paper detected');
-                            paperDecay += 0.3;
+                            // paperDecay += 0.3;
+                            paperDecay2[0] = 1;
                         }
                     }
 
-                    prevFrameVertices = vertices;
+                    // prevFrameVertices = vertices;
+                    prevFrameVertices = verticesScaled;
                 }
 
                 contour.delete();
@@ -184,16 +197,27 @@
         // img.src = event.target.result;
 
         let updateARCanvasLastCalled = 0;
+        let paperVertices = undefined;
         const updateARCanvas = () => {
+            // console.log(';kljhg')
 
             // paperDecay *= 0.5**(1/60);
 
-            const now = performance.now();
-            const delta = now - updateARCanvasLastCalled;
-            paperDecay -= delta / 1000;
-            paperDecay *= 0.5**(delta / 1000);
-            paperDecay = Math.max(0, paperDecay);
-            updateARCanvasLastCalled = now;
+            // const now = performance.now();
+            // const delta = now - updateARCanvasLastCalled;
+            // paperDecay -= delta / 1000 * 10;
+            // paperDecay *= 0.5**(delta / 1000);
+            // paperDecay = Math.max(0, paperDecay);
+            // updateARCanvasLastCalled = now;
+
+            const range = Array(paperDecay2.length).fill().map((_, i) => i);
+            const weightsUnnormalized = range.map(i => Math.E**(-i/10));
+            const sum = weightsUnnormalized.reduce((a, b) => a + b, 0);
+            const weights = weightsUnnormalized.map(w => w / sum);
+            const weightedSum = paperDecay2.reduce((a, b, i) => a + b * weights[i], 0);
+            console.log(weightedSum)
+
+            const paperDecay = weightedSum;
 
             console.log(paperDecay);
             const arCanvas = document.getElementById('arCanvas');
@@ -204,8 +228,24 @@
 
             if (paperDecay > 0) {
                 // arContext.fillStyle = 'rgba(0, 255, 0, 0.5)';
-                arContext.fillStyle = `rgba(0, 255, 0, ${Math.min(0.5, paperDecay/10)})`;
+                arContext.fillStyle = `rgba(0, 255, 0, ${Math.min(0.5, paperDecay)})`;
                 arContext.fillRect(0, 0, arCanvas.width, arCanvas.height);
+
+                paperVertices = prevFrameVertices;
+
+                if (paperVertices) {
+                    // arContext.fillStyle = 'rgba(255, 0, 0, 0.5)';
+                    arContext.fillStyle = `rgba(255, 0, 0, ${Math.min(0.5, paperDecay)})`;
+                    arContext.beginPath();
+                    arContext.moveTo(paperVertices[0].x * arCanvas.width, paperVertices[0].y * arCanvas.width);
+                    for (let i = 1; i < paperVertices.length; i++) {
+                        arContext.lineTo(paperVertices[i].x * arCanvas.width, paperVertices[i].y * arCanvas.width);
+                    }
+                    arContext.closePath();
+                    arContext.fill();
+                }
+            } else {
+                paperVertices = undefined;
             }
         }
 
