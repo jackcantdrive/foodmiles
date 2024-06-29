@@ -4,6 +4,11 @@
     <title>Paper Detection</title>
     <script async src="./opencv-4.5.5.js"></script>
     <!-- <script async src="https://docs.opencv.org/4.5.5/opencv.js"></script> -->
+    <style>
+        #arCanvas {
+            height: 30vh;
+        }
+    </style>
 </head>
 <body>
     <h1>Paper Detection</h1>
@@ -11,9 +16,10 @@
 
     <img id='image' src="IMG_8409-2-copy.jpg"/>
     <!-- <video id="webcam" width="640" height="480" autoplay></video> -->
-    <video id="webcam" src='IMG_8416.mp4' controls autoplay></video>
+    <video id="webcam" src='IMG_8416.mp4' controls autoplay muted></video>
 
     <canvas id="canvasOutput"></canvas>
+    <canvas id="arCanvas"></canvas>
 
     <script>
         let img = new Image();
@@ -22,6 +28,7 @@
         }
 
         let prevFrameVertices = undefined;
+        let paperDecay = 0;
 
         const scan = () => {
             let canvas = document.createElement('canvas');
@@ -147,9 +154,10 @@
                         const bottomRightDiff = Math.abs(bottomRight.x - bottomRightPrev.x) + Math.abs(bottomRight.y - bottomRightPrev.y);
                         const bottomLeftDiff = Math.abs(bottomLeft.x - bottomLeftPrev.x) + Math.abs(bottomLeft.y - bottomLeftPrev.y);
 
-                        const diffThreshold = 10;
+                        const diffThreshold = max_width/10;
                         if (topLeftDiff < diffThreshold && topRightDiff < diffThreshold && bottomRightDiff < diffThreshold && bottomLeftDiff < diffThreshold) {
-                            console.log('Paper detected');
+                            // console.log('Paper detected');
+                            paperDecay += 0.3;
                         }
                     }
 
@@ -162,6 +170,8 @@
 
             cv.imshow('canvasOutput', src);
 
+            updateARCanvas();
+
             // Clean up
             src.delete();
             dst.delete();
@@ -172,6 +182,32 @@
             // console.log(performance.now() - st);
         };
         // img.src = event.target.result;
+
+        let updateARCanvasLastCalled = 0;
+        const updateARCanvas = () => {
+
+            // paperDecay *= 0.5**(1/60);
+
+            const now = performance.now();
+            const delta = now - updateARCanvasLastCalled;
+            paperDecay -= delta / 1000;
+            paperDecay *= 0.5**(delta / 1000);
+            paperDecay = Math.max(0, paperDecay);
+            updateARCanvasLastCalled = now;
+
+            console.log(paperDecay);
+            const arCanvas = document.getElementById('arCanvas');
+            const arContext = arCanvas.getContext('2d');
+            arCanvas.width = webcam.videoWidth;
+            arCanvas.height = webcam.videoHeight;
+            arContext.drawImage(webcam, 0, 0, arCanvas.width, arCanvas.height);
+
+            if (paperDecay > 0) {
+                // arContext.fillStyle = 'rgba(0, 255, 0, 0.5)';
+                arContext.fillStyle = `rgba(0, 255, 0, ${Math.min(0.5, paperDecay/10)})`;
+                arContext.fillRect(0, 0, arCanvas.width, arCanvas.height);
+            }
+        }
 
 
         function waitForOpenCV(callback) {
