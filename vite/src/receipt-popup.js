@@ -110,3 +110,13 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 // receiptPopup.classList.add('receiptPopupIn')
 
 // receiptPopup.classList.remove('receiptPopupIn')
+
+
+const webcam = document.getElementById('webcam');
+const receiptPopup = document.getElementById('receiptPopup');
+
+const handleClick = () => {
+    receiptPopup.classList.toggle('receiptPopupIn');
+}
+
+document.addEventListener('click', handleClick);
