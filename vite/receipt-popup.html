@@ -65,6 +65,22 @@
         bottom: 3vh;
     }
 
+    @keyframes colorPulse {
+        0% {
+            background-color: rgb(17, 179, 204);
+        }
+        50% {
+            background-color: rgb(12, 130, 150);
+        }
+        100% {
+            background-color: rgb(17, 179, 204);
+        }
+    }
+
+    #receiptPopup.loading {
+        animation: colorPulse 3s infinite;
+    }
+
     /* @keyframes moveBottom {
         from {
             bottom: -10vh;
