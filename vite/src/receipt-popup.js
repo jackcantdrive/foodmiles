@@ -117,6 +117,15 @@ const receiptPopup = document.getElementById('receiptPopup');
 
 const handleClick = () => {
     receiptPopup.classList.toggle('receiptPopupIn');
+    if (!receiptPopup.classList.contains('receiptPopupIn')) {
+        setTimeout(() => {
+            receiptPopup.classList.remove('loading');
+        }, 400);
+    }
 }
 
-document.addEventListener('click', handleClick);
+webcam.addEventListener('click', handleClick);
+
+receiptPopup.addEventListener('click', () => {
+    receiptPopup.classList.add('loading');
+})
