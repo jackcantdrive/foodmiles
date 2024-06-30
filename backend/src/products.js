@@ -30,6 +30,13 @@ const mock = [
         tokens: {
             LocalToken: 3,
         },
+    },
+    {
+        id: '5',
+        name: `sf water 500ml`,
+        tokens: {
+            WaterToken: 2,
+        },
     }
 ]
 

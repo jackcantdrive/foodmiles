@@ -19,6 +19,14 @@ const tokenContracts = [
         name: 'MeatlessToken',
         address: '0x62efa816904046ad9f53ba5219b8246af011ab42',
     },
+    {
+        name: 'LocalToken',
+        address: '0x39107afa918e91d12052f57520b371b15fcb6878',
+    },
+    {
+        name: 'WaterToken',
+        address: '0xd267dfd387819aa3ea0f260447d6e60f1004c2cf',
+    }
 ];
 
 export const creditUser = async (userAddress, product, verificationResult) => {

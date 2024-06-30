@@ -7,10 +7,10 @@ import { verifyImage } from './verification.js';
 // edit this to mock out the net
 //-*-*-
 // to actually credit user
-// import { creditUser } from './creditUser.js';
+import { creditUser } from './creditUser.js';
 //--*--
 // to mock out and allow running with `node src/server.js`
-const creditUser = () => false;
+// const creditUser = () => false;
 //-*-*-
 
 const app = express();

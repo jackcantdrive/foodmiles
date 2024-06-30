@@ -4,11 +4,12 @@ import { ethers } from 'hardhat';
 const tokenContractNames = [
     "MeatlessToken",
     "LocalToken",
+    "WaterToken"
 ];
 
 async function main(): Promise<void> {
 
-    const tokenIndex = 1;
+    const tokenIndex = 2;
 
     const tokenName = tokenContractNames[tokenIndex];
 

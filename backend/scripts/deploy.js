@@ -5,11 +5,12 @@ const { ethers } = pkg;
 const tokenContractNames = [
     "MeatlessToken",
     "LocalToken",
+    "WaterToken",
 ];
 
 async function main() {
 
-    const tokenIndex = 1;
+    const tokenIndex = 2;
 
     const tokenName = tokenContractNames[tokenIndex];
 

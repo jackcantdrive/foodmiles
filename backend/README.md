@@ -24,7 +24,7 @@ then run with `node src/server.js`
 
 ## to run server with solo or test net connectivity
 (run from root of repo ./meatless/)
-`npx hardhat run src/server.js --network vechain_solo`
+`npx hardhat run src/server.js --network vechain_solo` or `npx hardhat run src/server.js --network vechain_testnet`
 
 ## test ui
 test ui for image verification and token crediting exposed at http://localhost:8555/verify-image-test.html
