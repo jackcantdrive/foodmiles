@@ -1,7 +1,7 @@
 import fs from 'fs';
 import OpenAI from "openai";
 
-const mockImageModelCall = true;
+const mockImageModelCall = false;
 
 const openai = new OpenAI();
 
@@ -20,7 +20,7 @@ export const verifyImage = async (product, imageAsBase64) => {
 
     // const base64 = getImageAsBase64(image);
 
-    const prompt = `You will be given an image, and your task is to verify an image contains an open packet of a product.
+    const prompt = `You will be given an image, and your task is to verify an image contains an open packet of a product or a meal on a plate in a resturant, or a receipt lisiting the product.
 This will be used in an app designed to encourage users to eat more sustainably, and provide small monetary rewards for doing so. Your task is to verify they have actually purchased the product and used it, and not just taken a picture of it in a store.
 
 Response in JSON format, with a boolean field "verified" set to true if the image contains the product, and false otherwise.
@@ -39,7 +39,8 @@ Additionally, include a field "message" with a string describing why the image w
     }
 
     const response = await openai.chat.completions.create({
-        model: "gpt-4-vision-preview",
+        // model: "gpt-4-vision-preview",
+        model: "gpt-4o",
         max_tokens: 150,
         messages: [
             {
@@ -55,7 +56,7 @@ Additionally, include a field "message" with a string describing why the image w
                     {
                         type: "image_url",
                         image_url: {
-                            "url": `data:${image.mimetype};base64,${imageAsBase64}`,
+                            "url": `data:${'image/jpeg'};base64,${imageAsBase64}`,
                         },
                     },
                 ],

@@ -176,7 +176,7 @@ receiptPopup.addEventListener('click', () => {
             receiptPopup.classList.remove('loading');
             setTimeout(() => {
                 receiptPopup.classList.remove('receiptPopupIn');
-            }, 1300);
+            }, 1300 + receiptPopup.textContent.length * 50);
         })
         .catch(error => {
             console.error('Error verifying receipt:', error);
