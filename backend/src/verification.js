@@ -1,7 +1,7 @@
 import fs from 'fs';
 import OpenAI from "openai";
 
-const mockImageModelCall = false;
+const mockImageModelCall = true;
 
 const openai = new OpenAI();
 
