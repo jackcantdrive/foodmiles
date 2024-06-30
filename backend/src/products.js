@@ -37,6 +37,13 @@ const mock = [
         tokens: {
             WaterToken: 2,
         },
+    },
+    {
+        id: '6',
+        name: `California Tomatoes`,
+        tokens: {
+            LocalToken: 2,
+        },
     }
 ]
 

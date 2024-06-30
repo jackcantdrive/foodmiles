@@ -121,6 +121,8 @@ const handleClick = () => {
         setTimeout(() => {
             receiptPopup.classList.remove('loading');
         }, 400);
+    } else {
+        receiptPopup.textContent = 'Claim 2 LOCL';
     }
 }
 
@@ -136,11 +138,9 @@ receiptPopup.addEventListener('click', () => {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(webcam, 0, 0, canvas.width, canvas.height);
 
-    // post to http://localhost:8555/verify. imageFile, userAddress, productId
-
     const imageFile = canvas.toDataURL('image/jpeg', 0.8);
     const userAddress = DAppKitUI.wallet.state.address;
-    const productId = 1;
+    const productId = 6;
 
     const formData = new FormData();
     formData.append('id', productId);
@@ -158,7 +158,25 @@ receiptPopup.addEventListener('click', () => {
         .then(response => response.json())
         .then(data => {
             console.log(data);
-            receiptPopup.classList.remove('receiptPopupIn');
+            if (data.verified) {
+                receiptPopup.textContent = 'Receipt verified successfully!';
+            } else {
+                if (data.failedVerificationMessage) {
+                    receiptPopup.textContent = data.failedVerificationMessage;
+                }
+
+                if (data.creditErrorMessage) {
+                    receiptPopup.textContent = data.creditErrorMessage;
+                }
+
+                if (data.internalMessage) {
+                    receiptPopup.textContent = 'Failed to verify receipt. Please try again.'
+                }
+            }
+            receiptPopup.classList.remove('loading');
+            setTimeout(() => {
+                receiptPopup.classList.remove('receiptPopupIn');
+            }, 1300);
         })
         .catch(error => {
             console.error('Error verifying receipt:', error);
