@@ -91,6 +91,7 @@ handleConnected(DAppKitUI.wallet.state.address);
 
 DAppKitUI.modal.onConnectionStatusChange(handleConnected);
 
+let webcamLoaded = false;
 
 const requestWebcamPermission = async () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -98,6 +99,7 @@ const requestWebcamPermission = async () => {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             const video = document.getElementById('webcam');
             video.srcObject = stream;
+            webcamLoaded = true;
         } catch (error) {
             console.error("Error accessing the webcam: ", error);
         }
@@ -124,7 +126,7 @@ const webcam = document.getElementById('webcam');
 const receiptPopup = document.getElementById('receiptPopup');
 
 const handleClick = e => {
-    if (e.clientY < window.innerHeight * 0.7) {
+    if (!webcamLoaded && e.clientY < window.innerHeight * 0.7) {
         requestWebcamPermission();
     } else {
         receiptPopup.classList.toggle('receiptPopupIn');
@@ -163,9 +165,10 @@ receiptPopup.addEventListener('click', () => {
 
     formData.append('imageAsBase64', imageAsBase64);
 
-    const serverUrl = 'http://localhost:8555';
+    // const serverUrl = 'http://localhost:8555/';
+    const serverUrl = 'https://0ab18304-b487-47e1-9e32-64aaf04951f9-00-13tzd5yrxjq4f.riker.replit.dev/';
 
-    fetch(`${serverUrl}/verify`, {
+    fetch(`${serverUrl}verify`, {
         method: 'POST',
         body: formData,
     })
