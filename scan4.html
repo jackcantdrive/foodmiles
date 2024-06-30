@@ -3,6 +3,7 @@
 <head>
     <title>Paper Detection</title>
     <script async src="./opencv-4.5.5.js"></script>
+    <script src="./perspective.min.js"></script>
     <!-- <script async src="https://docs.opencv.org/4.5.5/opencv.js"></script> -->
     <style>
         #arCanvas {
@@ -13,7 +14,8 @@
 <body>
     <h1>Paper Detection</h1>
     <input type="file" id="fileInput" accept="image/*">
-    <img id="modifiedMenu" src="IMG_8418-perspective-crop.png"/>
+    <!-- <img id="modifiedMenu" src="IMG_8418-perspective-crop.png"/> -->
+    <img id="modifiedMenu" src="test-image.png"/>
     <img id='image' src="IMG_8409-2-copy.jpg"/>
     <!-- <video id="webcam" width="640" height="480" autoplay></video> -->
     <!-- <video id="webcam" src='IMG_8416.mp4' controls autoplay muted></video> -->
@@ -150,6 +152,7 @@
                         // const verticesSorted = vertices;
 
                         // debugger
+                        // note: these labels (eg top left) are probably wrong
                         const topLeft = verticesScaled[0];
                         const topRight = verticesScaled[1];
                         const bottomRight = verticesScaled[2];
@@ -289,7 +292,77 @@
                     //     { x: 200, y: 200 },
                     //     { x: 0, y: 200 }
                     // ];
-                    const dstPoints = prevFrameVertices.map(p => ({x: p.x * arCanvas.width, y: p.y * arCanvas.height}));
+                    const dstPoints = prevFrameVertices.map(p => ({x: p.x * arCanvas.width, y: p.y * arCanvas.width}));
+
+                    var p = new Perspective(arContext, modifiedMenu);
+                    // p.draw([
+                    //         [30, 30],
+                    //         [modifiedMenu.width - 50, 50],
+                    //         [modifiedMenu.width - 70, modifiedMenu.height - 30],
+                    //         [10, modifiedMenu.height]
+                    // ]);
+
+                    const mid = {
+                        x: dstPoints.reduce((a, b) => a + b.x, 0) / dstPoints.length,
+                        y: dstPoints.reduce((a, b) => a + b.y, 0) / dstPoints.length
+                    };
+
+                    
+                    // low low
+                    const topLeft = dstPoints.find(p => p.x < mid.x && p.y < mid.y);
+                    // high low
+                    const topRight = dstPoints.find(p => p.x > mid.x && p.y < mid.y);
+                    // high high
+                    const bottomRight = dstPoints.find(p => p.x > mid.x && p.y > mid.y);
+                    // low high
+                    const bottomLeft = dstPoints.find(p => p.x < mid.x && p.y > mid.y);
+
+                    console.log(dstPoints, [topLeft, topRight, bottomRight, bottomLeft])
+
+
+                    // p.draw([topLeft, topRight, bottomRight, bottomLeft]);
+                    p.draw([[topLeft.x, topLeft.y], [topRight.x, topRight.y], [bottomRight.x, bottomRight.y], [bottomLeft.x, bottomLeft.y]]);
+
+                    // p.draw([
+                    //         [30, 30],
+                    //         [100 - 50, 50],
+                    //         [100 - 70, 100 - 30],
+                    //         [10, 100]
+                    // ]);
+
+
+                    // p.draw([
+                    //         [30, 30],
+                    //         [1000, 50],
+                    //         [1000, 1000],
+                    //         [10, 1000]
+                    // ]);
+
+                    // p.draw([
+                    //         [30, 30],
+                    //         [1000, 50],
+                    //         [1000, 1000],
+                    //         [10, 1000]
+                    // ]);
+
+                    // p.draw([
+                    //         [30, 30],
+                    //         [100, 50],
+                    //         [100, 100],
+                    //         [10, 100]
+                    // ]);
+
+                    // p.draw([dstPoints[1], dstPoints[0], dstPoints[3], dstPoints[2]]);
+                    // debugger
+
+
+                    // p.draw([
+                    //         [30, 30],
+                    //         [arCanvas.width - 50, 50],
+                    //         [arCanvas.width - 70, arCanvas.height - 30],
+                    //         [10, arCanvas.height]
+                    // ]);
+                    // debugger
 
                     // debugger
 
@@ -305,34 +378,34 @@
                     // );
 
 
-                    arContext.fillStyle = '#ff0';
-                    // arContext.beginPath();
-                    // arContext.moveTo(paperVertices[0].x * arCanvas.width, paperVertices[0].y * arCanvas.width);
-                    // for (let i = 1; i < paperVertices.length; i++) {
-                    //     arContext.lineTo(paperVertices[i].x * arCanvas.width, paperVertices[i].y * arCanvas.width);
-                    // }
-                    // arContext.closePath();
-                    // arContext.fill();
+                    // arContext.fillStyle = '#ff0';
+                    // // arContext.beginPath();
+                    // // arContext.moveTo(paperVertices[0].x * arCanvas.width, paperVertices[0].y * arCanvas.width);
+                    // // for (let i = 1; i < paperVertices.length; i++) {
+                    // //     arContext.lineTo(paperVertices[i].x * arCanvas.width, paperVertices[i].y * arCanvas.width);
+                    // // }
+                    // // arContext.closePath();
+                    // // arContext.fill();
 
-                    // arContext.setTransform(1, 0.2, 0.8, 1, 0, 0);
-                    arContext.setTransform(
-                        (dstPoints[1].x - dstPoints[0].x) / (srcPoints[1].x - srcPoints[0].x),
-                        (dstPoints[2].x - dstPoints[1].x) / (srcPoints[2].x - srcPoints[1].x),
-                        (dstPoints[0].y - dstPoints[1].y + dstPoints[2].y - dstPoints[3].y) /
-                        (srcPoints[0].y - srcPoints[1].y + srcPoints[2].y - srcPoints[3].y),
-                        (dstPoints[0].y - dstPoints[3].y) / (srcPoints[0].y - srcPoints[3].y),
-                        dstPoints[0].x - srcPoints[0].x * ((dstPoints[1].x - dstPoints[0].x) / (srcPoints[1].x - srcPoints[0].x)),
-                        dstPoints[0].y - srcPoints[0].y * ((dstPoints[0].y - dstPoints[3].y) / (srcPoints[0].y - srcPoints[3].y))
-                    );
-                    arContext.fillRect(0, 0, 100, 100);
+                    // // arContext.setTransform(1, 0.2, 0.8, 1, 0, 0);
+                    // arContext.setTransform(
+                    //     (dstPoints[1].x - dstPoints[0].x) / (srcPoints[1].x - srcPoints[0].x),
+                    //     (dstPoints[2].x - dstPoints[1].x) / (srcPoints[2].x - srcPoints[1].x),
+                    //     (dstPoints[0].y - dstPoints[1].y + dstPoints[2].y - dstPoints[3].y) /
+                    //     (srcPoints[0].y - srcPoints[1].y + srcPoints[2].y - srcPoints[3].y),
+                    //     (dstPoints[0].y - dstPoints[3].y) / (srcPoints[0].y - srcPoints[3].y),
+                    //     dstPoints[0].x - srcPoints[0].x * ((dstPoints[1].x - dstPoints[0].x) / (srcPoints[1].x - srcPoints[0].x)),
+                    //     dstPoints[0].y - srcPoints[0].y * ((dstPoints[0].y - dstPoints[3].y) / (srcPoints[0].y - srcPoints[3].y))
+                    // );
+                    // arContext.fillRect(0, 0, 100, 100);
 
 
-                    // Draw the transformed image
-                    // arContext.drawImage(modifiedMenu, 0, 0);
+                    // // Draw the transformed image
+                    // // arContext.drawImage(modifiedMenu, 0, 0);
 
                     
-                    arContext.restore();
-                    // debugger
+                    // arContext.restore();
+                    // // debugger
 
                 }
             } else {
