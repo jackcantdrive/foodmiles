@@ -30,10 +30,18 @@
     }
 
     #header {
-        height: 4vh;
+        /* height: 6vh; */
         background: rgb(17, 179, 204);
         position: absolute;
         width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    #header vdk-button {
+        /* margin-right: 2vh; */
+        margin: 1vh 2vh;
     }
 
     #receiptPopup {
@@ -74,10 +82,12 @@
 <body>
 <div id="container">
     <video id="webcam" width="640" height="480" autoplay></video>
-    <div id="header"></div>
+    <div id="header">
+        <vdk-button></vdk-button>
+    </div>
 
     <div id="receiptPopup">Claim 3 LOCL</div>
 </div>
-<script src="receipt-popup.js" type="module"></script>
+<script src="src/receipt-popup.js" type="module"></script>
 </body>
 </html>
