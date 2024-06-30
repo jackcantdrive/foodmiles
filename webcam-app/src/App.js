@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { DAppKitProvider } from '@vechain/dapp-kit-react';
 import './App.css';
 
 function App() {
