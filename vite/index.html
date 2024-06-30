@@ -89,16 +89,40 @@
             bottom: 3vh;
         }
     } */
+
+    #allowWebcamAccess {
+        position: absolute;
+        top: 50vh;
+        /* left: 50%;
+        transform: translateX(-50%); */
+        background: rgb(17, 179, 204);
+        padding: 1vh 2vh;
+        border-radius: 10vw;
+        color: #fff;
+        font-size: 2vh;
+        /* cursor: pointer; */
+    }
+
+    #allowWebcamAccessContainer {
+        display: flex;
+        justify-content: center;
+    }
 </style>
 
 </head>
 <body>
 <div id="container">
-    <!-- <video id="webcam" width="640" height="480" autoplay></video> -->
-    <video src='/public/ar-demo-2.slowed-at-end.mp4' id="webcam" width="640" height="480" autoplay></video>
+    <!-- button to allow webcam access -->
+    <div id="allowWebcamAccessContainer">
+        <div id="allowWebcamAccess">Allow Webcam Access</div>
+    </div>
+    <video id="webcam" width="640" height="480" autoplay></video>
+    <!-- <video src='/ar-demo-2.slowed-at-end.mp4' id="webcam" width="640" height="480" autoplay></video> -->
     <div id="header">
         <vdk-button></vdk-button>
     </div>
+
+    
 
     <div id="receiptPopup">Claim 3 LOCL</div>
 </div>

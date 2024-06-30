@@ -92,21 +92,26 @@ handleConnected(DAppKitUI.wallet.state.address);
 DAppKitUI.modal.onConnectionStatusChange(handleConnected);
 
 
+const requestWebcamPermission = async () => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            const video = document.getElementById('webcam');
+            video.srcObject = stream;
+        } catch (error) {
+            console.error("Error accessing the webcam: ", error);
+        }
+    } else {
+        console.error("getUserMedia not supported by this browser.");
+    }
+}
 
 const video = document.getElementById('webcam');
 const useWebcam = true;
 if (useWebcam) {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function(stream) {
-                video.srcObject = stream;
-            })
-            .catch(function(error) {
-                console.error("Error accessing the webcam: ", error);
-            });
-    } else {
-        console.error("getUserMedia not supported by this browser.");
-    }
+    requestWebcamPermission();
+} else {
+    video.src = '/ar-demo-2.slowed-at-end.mp4';
 }
 
 
@@ -118,14 +123,18 @@ if (useWebcam) {
 const webcam = document.getElementById('webcam');
 const receiptPopup = document.getElementById('receiptPopup');
 
-const handleClick = () => {
-    receiptPopup.classList.toggle('receiptPopupIn');
-    if (!receiptPopup.classList.contains('receiptPopupIn')) {
-        setTimeout(() => {
-            receiptPopup.classList.remove('loading');
-        }, 400);
+const handleClick = e => {
+    if (e.clientY < window.innerHeight * 0.7) {
+        requestWebcamPermission();
     } else {
-        receiptPopup.textContent = 'Claim LOCL';
+        receiptPopup.classList.toggle('receiptPopupIn');
+        if (!receiptPopup.classList.contains('receiptPopupIn')) {
+            setTimeout(() => {
+                receiptPopup.classList.remove('loading');
+            }, 400);
+        } else {
+            receiptPopup.textContent = 'Claim LOCL';
+        }
     }
 }
 
@@ -154,7 +163,9 @@ receiptPopup.addEventListener('click', () => {
 
     formData.append('imageAsBase64', imageAsBase64);
 
-    fetch('http://localhost:8555/verify', {
+    const serverUrl = 'http://localhost:8555';
+
+    fetch(`${serverUrl}/verify`, {
         method: 'POST',
         body: formData,
     })
