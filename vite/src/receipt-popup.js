@@ -94,7 +94,7 @@ DAppKitUI.modal.onConnectionStatusChange(handleConnected);
 
 
 const video = document.getElementById('webcam');
-const useWebcam = true;
+const useWebcam = false;
 if (useWebcam) {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ video: true })
