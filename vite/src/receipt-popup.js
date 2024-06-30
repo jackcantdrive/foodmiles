@@ -95,17 +95,17 @@ DAppKitUI.modal.onConnectionStatusChange(handleConnected);
 
 const video = document.getElementById('webcam');
 
-if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then(function(stream) {
-            video.srcObject = stream;
-        })
-        .catch(function(error) {
-            console.error("Error accessing the webcam: ", error);
-        });
-} else {
-    console.error("getUserMedia not supported by this browser.");
-}
+// if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+//     navigator.mediaDevices.getUserMedia({ video: true })
+//         .then(function(stream) {
+//             video.srcObject = stream;
+//         })
+//         .catch(function(error) {
+//             console.error("Error accessing the webcam: ", error);
+//         });
+// } else {
+//     console.error("getUserMedia not supported by this browser.");
+// }
 
 // receiptPopup.classList.add('receiptPopupIn')
 
@@ -140,7 +140,7 @@ receiptPopup.addEventListener('click', () => {
 
     const imageFile = canvas.toDataURL('image/jpeg', 0.8);
     const userAddress = DAppKitUI.wallet.state.address;
-    const productId = 1;
+    const productId = 2;
 
     const formData = new FormData();
     formData.append('id', productId);
@@ -173,20 +173,20 @@ receiptPopup.addEventListener('click', () => {
             } else {
                 if (data.failedVerificationMessage) {
                     receiptPopup.textContent = data.failedVerificationMessage;
-                }
-
-                if (data.creditErrorMessage) {
-                    receiptPopup.textContent = data.creditErrorMessage;
-                }
-
-                if (data.internalMessage) {
-                    receiptPopup.textContent = 'Failed to verify receipt. Please try again.'
+                } else {
+                    if (data.creditErrorMessage) {
+                        receiptPopup.textContent = data.creditErrorMessage;
+                    } else {
+                        if (data.internalMessage) {
+                            receiptPopup.textContent = 'Failed to verify receipt. Please try again.'
+                        }
+                    }
                 }
             }
             receiptPopup.classList.remove('loading');
-            setTimeout(() => {
-                receiptPopup.classList.remove('receiptPopupIn');
-            }, 1300 + receiptPopup.textContent.length * 50);
+            // setTimeout(() => {
+            //     receiptPopup.classList.remove('receiptPopupIn');
+            // }, 1300 + receiptPopup.textContent.length * 50);
         })
         .catch(error => {
             console.error('Error verifying receipt:', error);

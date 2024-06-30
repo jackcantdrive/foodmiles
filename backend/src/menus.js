@@ -31,6 +31,13 @@ const mock = [
             }
           }
     },
+    {
+        id: '2',
+        name: 'Coffee cake with cinnamon streusel',
+        menu: {
+            "Coffee cake with cinnamon streusel": 1700
+        },
+    },
 ]
 
 export const getMenuDetails = (menuID) => {

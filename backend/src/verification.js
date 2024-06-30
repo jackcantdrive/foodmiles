@@ -5,7 +5,7 @@ const mockImageModelCall = false;
 
 const openai = new OpenAI();
 
-export const verifyImage = async (product, imageAsBase64) => {
+export const verifyImage = async (menu, imageAsBase64) => {
     // image:
     // {
     //     fieldname: 'image',
@@ -20,17 +20,19 @@ export const verifyImage = async (product, imageAsBase64) => {
 
     // const base64 = getImageAsBase64(image);
 
+    console.log('menu', menu);
+
     const prompt = `You will be given an image and a menu, and your task is to verify an image contains a meal on a plate in a restaurant, or a receipt lisiting the product.
 This will be used in an app designed to encourage users to eat more sustainably, and provide small monetary rewards for doing so. Your task is to verify they have actually purchased the product and used it, and not just taken a picture of it in a store.
 
 You will be given the menu as a JSON object containing menu subsections and item names as keys, and the total food miles the ingredients in the item have travelled as values.
 
 Response in JSON format, with a boolean field "verified" set to true if the image contains the product, and false otherwise. Additionally, return the matched product name in the "product" field if the image is verified, and the associated food miles in the "foodMiles" field.
-Additionally, include a field "message" with a string describing why the image was not verified, if applicable. If the image is verified, the message field should be omitted. Be kind to the user and provide helpful feedback if the image is not verified. Keep feedback short (<10 words). If the product in the image is not the specified menu, say so and include the name of place the menu is from (shorten it to max 4 words if longer than this), and say please. For example: "Incorrect product, please submit a item from Piccino's Menu.".`;
+Additionally, include a field "message" with a string describing why the image was not verified, if applicable. If the image is verified, the message field should be omitted. Be kind to the user and provide helpful feedback if the image is not verified. Keep feedback short (<10 words). If the product in the image is not the specified menu, say so and include the name of place the menu is from if you know it (shorten it to max 4 words if longer than this), and say please. For example: "Product not recognised, please submit a item from the given menu." Only mention a receipt if there is one in the photo. If there is no receipt in the photo, DO NOT say failed to verify receipt. Try to give a reason rather than only saying eg failed to verify product, please try again.`;
 
-    let userLevelMessage = `Product name: ${product.name}`;
-    if (product.description) {
-        userLevelMessage += `Description: ${product.description}`;
+    let userLevelMessage = `Menu name: ${menu.name}`;
+    if (menu.menu) {
+        userLevelMessage += `Description: ${JSON.stringify(menu.menu)}`;
     }
 
     if (mockImageModelCall) {
@@ -102,13 +104,13 @@ Additionally, include a field "message" with a string describing why the image w
         };
     }
 
-    if (jsonFromLLM.message.split(' ').length > 10) {
-        return {
-            verified: false,
-            failedVerificationMessage: 'Failed to verify image. Please try again.',
-            internalMessage: "json from llms message field was too long",
-        };
-    }
+    // if (jsonFromLLM.message.split(' ').length > 10) {
+    //     return {
+    //         verified: false,
+    //         failedVerificationMessage: 'Failed to verify image. Please try again.',
+    //         internalMessage: "json from llms message field was too long",
+    //     };
+    // }
 
     if (jsonFromLLM.message === undefined || jsonFromLLM.message === null || jsonFromLLM.message === '') {
         return {

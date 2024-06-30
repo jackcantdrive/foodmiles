@@ -8,10 +8,10 @@ import { verifyImage } from './verification.js';
 // edit this to mock out the net
 //-*-*-
 // to actually credit user
-import { creditUser } from './creditUser.js';
+// import { creditUser } from './creditUser.js';
 //--*--
 // to mock out and allow running with `node src/server.js`
-// const creditUser = () => false;
+const creditUser = () => false;
 //-*-*-
 
 const app = express();
@@ -81,7 +81,7 @@ app.post('/verify', upload.single('image'), async (req, res) => {
     const product = {
         name: verificationResult.product,
         tokens: {
-            LocalToken: Math.max(0, Math.ceil(4 - Math.log10(verificationResult.foodMiles))),
+            LocalToken: Math.min(5, Math.max(0, Math.ceil(4 - Math.log10(verificationResult.foodMiles)))),
         }
     };
 
