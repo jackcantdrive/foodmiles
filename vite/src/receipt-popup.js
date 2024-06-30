@@ -94,7 +94,7 @@ DAppKitUI.modal.onConnectionStatusChange(handleConnected);
 
 
 const video = document.getElementById('webcam');
-const useWebcam = false;
+const useWebcam = true;
 if (useWebcam) {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ video: true })
@@ -150,7 +150,7 @@ receiptPopup.addEventListener('click', () => {
     formData.append('userAddress', userAddress);
 
     const imageAsBase64 = imageFile.split(',')[1];
-    console.log('imageAsBase64', imageAsBase64);
+    // console.log('imageAsBase64', imageAsBase64);
 
     formData.append('imageAsBase64', imageAsBase64);
 
