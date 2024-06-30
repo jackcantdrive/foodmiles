@@ -1,7 +1,7 @@
 import fs from 'fs';
 import OpenAI from "openai";
 
-const mockImageModelCall = true;
+const mockImageModelCall = false;
 
 const openai = new OpenAI();
 
@@ -20,11 +20,13 @@ export const verifyImage = async (product, imageAsBase64) => {
 
     // const base64 = getImageAsBase64(image);
 
-    const prompt = `You will be given an image, and your task is to verify an image contains an open packet of a product or a meal on a plate in a resturant, or a receipt lisiting the product.
+    const prompt = `You will be given an image and a menu, and your task is to verify an image contains a meal on a plate in a restaurant, or a receipt lisiting the product.
 This will be used in an app designed to encourage users to eat more sustainably, and provide small monetary rewards for doing so. Your task is to verify they have actually purchased the product and used it, and not just taken a picture of it in a store.
 
-Response in JSON format, with a boolean field "verified" set to true if the image contains the product, and false otherwise.
-Additionally, include a field "message" with a string describing why the image was not verified, if applicable. If the image is verified, the message field should be omitted. Be kind to the user and provide helpful feedback if the image is not verified. Keep feedback short (<10 words). If the product in the image is not the specified product, say so and include the name of the wanted product (shorten it to max 4 words if longer than this), and say please. For example: "Incorrect product, please submit Grapefruit Ting.".`;
+You will be given the menu as a JSON object containing menu subsections and item names as keys, and the total food miles the ingredients in the item have travelled as values.
+
+Response in JSON format, with a boolean field "verified" set to true if the image contains the product, and false otherwise. Additionally, return the matched product name in the "product" field if the image is verified, and the associated food miles in the "foodMiles" field.
+Additionally, include a field "message" with a string describing why the image was not verified, if applicable. If the image is verified, the message field should be omitted. Be kind to the user and provide helpful feedback if the image is not verified. Keep feedback short (<10 words). If the product in the image is not the specified menu, say so and include the name of place the menu is from (shorten it to max 4 words if longer than this), and say please. For example: "Incorrect product, please submit a item from Piccino's Menu.".`;
 
     let userLevelMessage = `Product name: ${product.name}`;
     if (product.description) {
@@ -35,6 +37,8 @@ Additionally, include a field "message" with a string describing why the image w
         console.log('mocking image model call, returning verified: true')
         return {
             verified: true,
+            product: "Trumpet Mushrooms",
+            foodMiles: 2000,
         };
     }
 
@@ -85,6 +89,8 @@ Additionally, include a field "message" with a string describing why the image w
     if (jsonFromLLM.verified === true) {
         return {
             verified: true,
+            product: jsonFromLLM.product,
+            foodMiles: jsonFromLLM.foodMiles,
         };
     }
 

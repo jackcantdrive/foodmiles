@@ -122,7 +122,7 @@ const handleClick = () => {
             receiptPopup.classList.remove('loading');
         }, 400);
     } else {
-        receiptPopup.textContent = 'Claim 2 LOCL';
+        receiptPopup.textContent = 'Claim LOCL';
     }
 }
 
@@ -140,7 +140,7 @@ receiptPopup.addEventListener('click', () => {
 
     const imageFile = canvas.toDataURL('image/jpeg', 0.8);
     const userAddress = DAppKitUI.wallet.state.address;
-    const productId = 6;
+    const productId = 1;
 
     const formData = new FormData();
     formData.append('id', productId);
@@ -159,7 +159,17 @@ receiptPopup.addEventListener('click', () => {
         .then(data => {
             console.log(data);
             if (data.verified) {
-                receiptPopup.textContent = 'Receipt verified successfully!';
+                // receiptPopup.textContent = 'Receipt verified successfully!';
+                // {
+                //     "verified": true,
+                //     "product": "Trumpet Mushrooms",
+                //     "foodMiles": 2000,
+                //     "awardedTokens": {
+                //         "LocalToken": 1
+                //     },
+                //     "credited": {}
+                // }
+                receiptPopup.textContent = `Successfully claimed ${data.awardedTokens.LocalToken} LOCL for ${data.product}`;
             } else {
                 if (data.failedVerificationMessage) {
                     receiptPopup.textContent = data.failedVerificationMessage;

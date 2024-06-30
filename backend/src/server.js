@@ -1,7 +1,8 @@
 import express from 'express';
 import multer from 'multer';
 
-import { getProductDetails } from './products.js';
+// import { getProductDetails } from './products.js';
+import { getMenuDetails } from './menus.js';
 import { verifyImage } from './verification.js';
 
 // edit this to mock out the net
@@ -54,13 +55,13 @@ app.post('/verify', upload.single('image'), async (req, res) => {
         return res.status(400).json({ error: 'Missing image' });
     }
 
-    const product = getProductDetails(id);
+    const menu = getMenuDetails(id);
 
-    if (!product) {
-        return res.status(400).json({ error: 'Product not found' });
+    if (!menu) {
+        return res.status(400).json({ error: 'Menu not found' });
     }
 
-    const verificationResult = await verifyImage(product, imageAsBase64);
+    const verificationResult = await verifyImage(menu, imageAsBase64);
 
     if (!verificationResult.verified) {
         console.log('Verification failed:', verificationResult.failedVerificationMessage);
@@ -77,10 +78,20 @@ app.post('/verify', upload.single('image'), async (req, res) => {
         return;
     }
 
+    const product = {
+        name: verificationResult.product,
+        tokens: {
+            LocalToken: Math.max(0, Math.ceil(4 - Math.log10(verificationResult.foodMiles))),
+        }
+    };
+
+    console.log(product, verificationResult);
+
     const creditResponse = creditUser(userAddress, product, verificationResult);
 
     res.json({
         ...verificationResult,
+        awardedTokens: product.tokens,
         credited: creditResponse,
     });
 });
