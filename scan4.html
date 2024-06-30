@@ -14,8 +14,8 @@
 <body>
     <h1>Paper Detection</h1>
     <input type="file" id="fileInput" accept="image/*">
-    <!-- <img id="modifiedMenu" src="IMG_8418-perspective-crop.png"/> -->
-    <img id="modifiedMenu" src="test-image.png"/>
+    <img id="modifiedMenu" src="IMG_8418-perspective-crop.png"/>
+    <!-- <img id="modifiedMenu" src="test-image.png"/> -->
     <img id='image' src="IMG_8409-2-copy.jpg"/>
     <!-- <video id="webcam" width="640" height="480" autoplay></video> -->
     <!-- <video id="webcam" src='IMG_8416.mp4' controls autoplay muted></video> -->
@@ -231,9 +231,6 @@
             arContext.drawImage(webcam, 0, 0, arCanvas.width, arCanvas.height);
 
             if (paperDecay > 0) {
-                // arContext.fillStyle = 'rgba(0, 255, 0, 0.5)';
-                arContext.fillStyle = `rgba(0, 255, 0, ${Math.min(0.5, paperDecay)})`;
-                arContext.fillRect(0, 0, arCanvas.width, arCanvas.height);
 
                 paperVertices = prevFrameVertices;
 
@@ -408,6 +405,11 @@
                     // // debugger
 
                 }
+
+
+                // arContext.fillStyle = 'rgba(0, 255, 0, 0.5)';
+                arContext.fillStyle = `rgba(0, 255, 0, ${Math.min(0.5, paperDecay)})`;
+                arContext.fillRect(0, 0, arCanvas.width, arCanvas.height);
             } else {
                 paperVertices = undefined;
             }
