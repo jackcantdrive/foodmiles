@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- <title>X</title> -->
+<style>
+
+    * {
+        padding: 0;
+        margin: 0;
+    }
+
+    body {
+        overflow: hidden;
+    }
+
+    #webcam {
+        position: absolute; /* Position the video absolutely within the container */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ensure the video covers the container, cropping if necessary */
+    }
+
+    #container {
+        display: flex;
+        justify-content: center;
+    }
+
+    #header {
+        height: 4vh;
+        background: rgb(17, 179, 204);
+        position: absolute;
+        width: 100%;
+    }
+
+    #receiptPopup {
+        /* width: 80vw; */
+        /* height: 6vh; */
+        background: rgb(17, 179, 204);
+        position: absolute;
+        border-radius: 10vw;
+        /* bottom: 3vh; */
+        bottom: -10vh;
+        transition: bottom 0.5s ease-in-out;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2vh;
+        font-weight: 500;
+        color: #fff;
+        padding: 1.5vh 4vh;
+    }
+
+    #receiptPopup.receiptPopupIn {
+        /* animation: moveBottom 0.5s ease-in-out forwards; */
+        bottom: 3vh;
+    }
+
+    /* @keyframes moveBottom {
+        from {
+            bottom: -10vh;
+        }
+        to {
+            bottom: 3vh;
+        }
+    } */
+</style>
+
+</head>
+<body>
+<div id="container">
+    <video id="webcam" width="640" height="480" autoplay></video>
+    <div id="header"></div>
+
+    <div id="receiptPopup">Claim 3 LOCL</div>
+</div>
+<script src="receipt-popup.js"></script>
+</body>
+</html>
