@@ -1,0 +1,1 @@
+npx hardhat run src/server.js --network vechain_solo
