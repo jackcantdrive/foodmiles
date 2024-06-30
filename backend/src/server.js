@@ -16,6 +16,14 @@ import { creditUser } from './creditUser.js';
 const app = express();
 const port = 8555;
 
+//cors
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,POST');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
+
 const upload = multer({ dest: 'uploads/' });
 
 app.use(express.json());
@@ -36,13 +44,13 @@ app.get('/getProductDetails', (req, res) => {
 app.post('/verify', upload.single('image'), async (req, res) => {
     const id = req.body.id;
     const userAddress = req.body.userAddress;
-    const image = req.file;
+    const imageAsBase64 = req.body.imageAsBase64;
 
     if (!id) {
         return res.status(400).json({ error: 'Missing id parameter' });
     }
 
-    if (!image) {
+    if (!imageAsBase64) {
         return res.status(400).json({ error: 'Missing image' });
     }
 
@@ -52,7 +60,7 @@ app.post('/verify', upload.single('image'), async (req, res) => {
         return res.status(400).json({ error: 'Product not found' });
     }
 
-    const verificationResult = await verifyImage(product, image);
+    const verificationResult = await verifyImage(product, imageAsBase64);
 
     if (!verificationResult.verified) {
         console.log('Verification failed:', verificationResult.failedVerificationMessage);

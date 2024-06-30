@@ -5,7 +5,7 @@ const mockImageModelCall = true;
 
 const openai = new OpenAI();
 
-export const verifyImage = async (product, image) => {
+export const verifyImage = async (product, imageAsBase64) => {
     // image:
     // {
     //     fieldname: 'image',
@@ -18,7 +18,7 @@ export const verifyImage = async (product, image) => {
     //     size: 61763
     //   }
 
-    const base64 = getImageAsBase64(image);
+    // const base64 = getImageAsBase64(image);
 
     const prompt = `You will be given an image, and your task is to verify an image contains an open packet of a product.
 This will be used in an app designed to encourage users to eat more sustainably, and provide small monetary rewards for doing so. Your task is to verify they have actually purchased the product and used it, and not just taken a picture of it in a store.
@@ -55,7 +55,7 @@ Additionally, include a field "message" with a string describing why the image w
                     {
                         type: "image_url",
                         image_url: {
-                            "url": `data:${image.mimetype};base64,${base64}`,
+                            "url": `data:${image.mimetype};base64,${imageAsBase64}`,
                         },
                     },
                 ],

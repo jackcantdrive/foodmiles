@@ -128,4 +128,41 @@ webcam.addEventListener('click', handleClick);
 
 receiptPopup.addEventListener('click', () => {
     receiptPopup.classList.add('loading');
+
+    // take snapshot of webcam
+    const canvas = document.createElement('canvas');
+    canvas.width = webcam.videoWidth;
+    canvas.height = webcam.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(webcam, 0, 0, canvas.width, canvas.height);
+
+    // post to http://localhost:8555/verify. imageFile, userAddress, productId
+
+    const imageFile = canvas.toDataURL('image/jpeg', 0.8);
+    const userAddress = DAppKitUI.wallet.state.address;
+    const productId = 1;
+
+    const formData = new FormData();
+    formData.append('id', productId);
+    formData.append('userAddress', userAddress);
+
+    const imageAsBase64 = imageFile.split(',')[1];
+    console.log('imageAsBase64', imageAsBase64);
+
+    formData.append('imageAsBase64', imageAsBase64);
+
+    fetch('http://localhost:8555/verify', {
+        method: 'POST',
+        body: formData,
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            receiptPopup.classList.remove('receiptPopupIn');
+        })
+        .catch(error => {
+            console.error('Error verifying receipt:', error);
+            receiptPopup.classList.remove('receiptPopupIn');
+        });
+
 })
