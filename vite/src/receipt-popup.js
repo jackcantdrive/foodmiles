@@ -63,31 +63,33 @@ const vechainDAppKitOptions = {
 
 DAppKitUI.configure(vechainDAppKitOptions);
 
-// custom button configuration
+const {thor, vendor, wallet, modal} = DAppKitUI
 
-const customButton = document.getElementById('custom-button');
+// console.log(wallet)
 
-if (customButton) {
-    customButton.addEventListener('click', () => {
-        DAppKitUI.modal.open();
-    });
+// const foo = async () => {
+//     const res = await wallet.connect();
+//     console.log(res);
+// }
 
-    const handleConnected = (address) => {
-        if (address) {
-            const formattedAddress = `${address.slice(0, 6)}...${address.slice(
-                -4,
-            )}`;
-            customButton.innerText = `Disconnect from ${formattedAddress}`;
-        } else {
-            customButton.innerText = 'Connect Custom Button';
-        }
-    };
+// foo();
 
-    handleConnected(DAppKitUI.wallet.state.address);
+const handleConnected = (address) => {
+    if (address) {
+        console.log(address);
+        // const formattedAddress = `${address.slice(0, 6)}...${address.slice(
+        //     -4,
+        // )}`;
+        // console.log(`Disconnect from ${formattedAddress}`);
+    }
+    //  else {
+    //     console.log('Connect Custom Button');
+    // }
+};
 
-    DAppKitUI.modal.onConnectionStatusChange(handleConnected);
-}
+handleConnected(DAppKitUI.wallet.state.address);
 
+DAppKitUI.modal.onConnectionStatusChange(handleConnected);
 
 
 
