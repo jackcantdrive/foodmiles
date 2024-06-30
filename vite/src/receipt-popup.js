@@ -94,18 +94,21 @@ DAppKitUI.modal.onConnectionStatusChange(handleConnected);
 
 
 const video = document.getElementById('webcam');
+const useWebcam = true;
+if (useWebcam) {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                video.srcObject = stream;
+            })
+            .catch(function(error) {
+                console.error("Error accessing the webcam: ", error);
+            });
+    } else {
+        console.error("getUserMedia not supported by this browser.");
+    }
+}
 
-// if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-//     navigator.mediaDevices.getUserMedia({ video: true })
-//         .then(function(stream) {
-//             video.srcObject = stream;
-//         })
-//         .catch(function(error) {
-//             console.error("Error accessing the webcam: ", error);
-//         });
-// } else {
-//     console.error("getUserMedia not supported by this browser.");
-// }
 
 // receiptPopup.classList.add('receiptPopupIn')
 
